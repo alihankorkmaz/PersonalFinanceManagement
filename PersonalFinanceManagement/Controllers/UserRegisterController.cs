@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 using PersonalFinanceManagement.Dtos;
 using PersonalFinanceManagement.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PersonalFinanceManagement.Controllers
 {
@@ -18,7 +19,7 @@ namespace PersonalFinanceManagement.Controllers
             _context = context;
         }
 
-        [HttpPost("register")]
+        [HttpPost("register")]       
         public async Task<IActionResult> Register(UserRegisterDto userRegisterDto)
         {
             var userExists = await _context.Users.AnyAsync(u => u.Email == userRegisterDto.Email);

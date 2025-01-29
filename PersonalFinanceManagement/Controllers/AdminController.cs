@@ -65,5 +65,57 @@ namespace PersonalFinanceManagement.Controllers
 
             return NoContent();
         }
+
+        [HttpPut("update-key")]
+        public async Task<IActionResult> UpdateKey([FromBody] KeyUpdateDto keyUpdateDto)
+        {
+            if (string.IsNullOrEmpty(keyUpdateDto.Key))
+            {
+                return BadRequest(new { message = "Key cannot be empty." });
+            }
+
+            // Assuming you have a service to handle your data operations
+            var adminSettings = await _context.AdminSettings.FirstOrDefaultAsync();
+
+            if (adminSettings == null)
+            {
+                // Create a new entry if it doesn't exist
+                adminSettings = new AdminSettings
+                {
+                    RegistrationKey = keyUpdateDto.Key,
+                    ExpirationTime = DateTime.UtcNow.AddMinutes(keyUpdateDto.ExpiresIn)
+                };
+                _context.AdminSettings.Add(adminSettings);
+            }
+            else
+            {
+                // Update existing key and expiration time
+                adminSettings.RegistrationKey = keyUpdateDto.Key;
+                adminSettings.ExpirationTime = DateTime.UtcNow.AddMinutes(keyUpdateDto.ExpiresIn);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Registration key updated successfully." });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("current-key")]
+        public async Task<IActionResult> GetCurrentKey()
+        {
+            var adminSettings = await _context.AdminSettings.FirstOrDefaultAsync();
+            if (adminSettings == null)
+            {
+                return NotFound(new { message = "No registration key found." });
+            }
+            return Ok(new { key = adminSettings.RegistrationKey });
+        }
+
     }
+
+}
+public class KeyUpdateDto
+{
+    public string Key { get; set; }
+    public int ExpiresIn { get; set; } // in minutes
 }

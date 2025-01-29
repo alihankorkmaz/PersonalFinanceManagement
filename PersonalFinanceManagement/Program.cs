@@ -38,7 +38,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Database Context Configuration
+// Configure Database Context
 builder.Services.AddDbContext<FinanceContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -65,6 +65,18 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Add CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
+// Enable Authorization
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -76,11 +88,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Middleware for handling HTTPS redirection
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); // JWT Authentication Middleware
+// Middleware for handling CORS
+app.UseCors("AllowAll");
+
+// Middleware for authentication and authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
+// Map controllers to endpoints
 app.MapControllers();
 
 app.Run();

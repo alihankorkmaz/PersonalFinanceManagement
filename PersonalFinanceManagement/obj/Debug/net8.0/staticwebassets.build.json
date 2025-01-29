@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "sNVlh5mJ6tzrgLDaEx++9qj5DGdGgJX07RS8IjZREuc=",
+  "Source": "PersonalFinanceManagement",
+  "BasePath": "_content/PersonalFinanceManagement",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

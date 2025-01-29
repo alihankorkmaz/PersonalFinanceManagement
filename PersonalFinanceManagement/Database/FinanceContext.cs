@@ -7,6 +7,7 @@ public class FinanceContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Admin> Admins { get; set; }
+    public DbSet<AdminSettings> AdminSettings { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
