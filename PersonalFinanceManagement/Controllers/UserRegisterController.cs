@@ -26,7 +26,8 @@ namespace PersonalFinanceManagement.Controllers
             var adminExists = await _context.Admins.AnyAsync(u=>u.Email == userRegisterDto.Email);
             if (userExists || adminExists)
             {
-                return BadRequest(new { message = "Email is already in use." });
+                
+                return BadRequest(new ResponseDto { Message = "Email is already in use." });
             }
 
             var user = new User
@@ -39,7 +40,7 @@ namespace PersonalFinanceManagement.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "User registered successfully." });
+            return Ok(new ResponseDto { Message = "User registered successfully." });
         }
     }
 }
