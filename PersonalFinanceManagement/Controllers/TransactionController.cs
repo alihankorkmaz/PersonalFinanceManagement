@@ -8,7 +8,7 @@ namespace PersonalFinanceManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles ="User")]
+    [Authorize(Roles ="User")]
     public class TransactionController : ControllerBase
     {
         private readonly FinanceContext _context;
