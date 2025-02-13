@@ -29,7 +29,7 @@ namespace PersonalFinanceManagement.Tests
                 .Options;
 
             _context = new FinanceContext(_options);
-            _context.Database.EnsureCreated(); 
+            _context.Database.EnsureCreated();
 
             _controller = new AdminRegisterController(_context);
         }
@@ -48,25 +48,24 @@ namespace PersonalFinanceManagement.Tests
             var validRequest = new AdminRegisterDto
             {
                 Name = "New Admin",
-                Email = "newadmin@test.com", //unique email
+                Email = "newadmin@test.com", // unique email
                 Password = "securepassword"
             };
 
             // Act
             var result = await _controller.Register(validRequest);
 
-
             var okResult = result as OkObjectResult;
-            Assert.IsNotNull(okResult, "OkObjectResult dönmedi! Result: " + result?.GetType().Name);
+            Assert.IsNotNull(okResult, "OkObjectResult not returned! Result: " + result?.GetType().Name);
 
-            // response message check
+            // Response message check
             var response = okResult.Value as ResponseDto;
-            Assert.IsNotNull(response, "ResponseDto null! Controller'da ResponseDto kullanılıyor mu?");
+            Assert.IsNotNull(response, "ResponseDto is null! Is ResponseDto used in the controller?");
             Assert.AreEqual("Admin registered successfully.", response.Message);
 
-            // check if the admin is added to the database
+            // Check if the admin is added to the database
             var adminInDb = await _context.Admins.FirstOrDefaultAsync(a => a.Email == validRequest.Email);
-            Assert.IsNotNull(adminInDb, "Admin veritabanına eklenmedi!");
+            Assert.IsNotNull(adminInDb, "Admin was not added to the database!");
             Assert.AreEqual(validRequest.Name, adminInDb.Name);
         }
 
@@ -95,10 +94,10 @@ namespace PersonalFinanceManagement.Tests
 
             // Assert
             var badRequestResult = result as BadRequestObjectResult;
-            Assert.IsNotNull(badRequestResult, "BadRequestObjectResult dönmedi! Result: " + result?.GetType().Name);
+            Assert.IsNotNull(badRequestResult, "BadRequestObjectResult not returned! Result: " + result?.GetType().Name);
 
             var response = badRequestResult.Value as ResponseDto;
-            Assert.IsNotNull(response, "ResponseDto null! Controller'da ResponseDto kullanılıyor mu?");
+            Assert.IsNotNull(response, "ResponseDto is null! Is ResponseDto used in the controller?");
             Assert.AreEqual("Email is already in use.", response.Message);
         }
 
@@ -127,10 +126,10 @@ namespace PersonalFinanceManagement.Tests
 
             // Assert
             var badRequestResult = result as BadRequestObjectResult;
-            Assert.IsNotNull(badRequestResult, "BadRequestObjectResult dönmedi! Result: " + result?.GetType().Name);
+            Assert.IsNotNull(badRequestResult, "BadRequestObjectResult not returned! Result: " + result?.GetType().Name);
 
             var response = badRequestResult.Value as ResponseDto;
-            Assert.IsNotNull(response, "ResponseDto null! Controller'da ResponseDto kullanılıyor mu?");
+            Assert.IsNotNull(response, "ResponseDto is null! Is ResponseDto used in the controller?");
             Assert.AreEqual("Email is already in use.", response.Message);
         }
     }

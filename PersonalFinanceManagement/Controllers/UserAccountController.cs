@@ -9,7 +9,7 @@ namespace PersonalFinanceManagement.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "User")] // Bu controller sadece User rolü için erişilebilir
+    [Authorize(Roles = "User")] // Accessible only to authenticated users
     public class UserAccountController : ControllerBase
     {
         private readonly FinanceContext _context;

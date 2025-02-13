@@ -45,7 +45,7 @@ namespace PersonalFinanceManagement.Tests
             await _context.Users.AddAsync(existingUser);
             await _context.SaveChangesAsync();
 
-            // request with existing email
+            // Request with existing email
             var duplicateRequest = new UserRegisterDto
             {
                 Name = "New User",
@@ -57,11 +57,11 @@ namespace PersonalFinanceManagement.Tests
             var result = await _controller.Register(duplicateRequest);
 
             var badRequestResult = result as BadRequestObjectResult;
-            Assert.IsNotNull(badRequestResult, "Result BadRequestObjectResult olmalı");
+            Assert.IsNotNull(badRequestResult, "Result should be BadRequestObjectResult");
 
-            // cast to DTO
+            // Cast to DTO
             var response = badRequestResult.Value as ResponseDto;
-            Assert.IsNotNull(response, "ResponseDto dönmeli");
+            Assert.IsNotNull(response, "ResponseDto should be returned");
             Assert.AreEqual("Email is already in use.", response.Message);
         }
 
@@ -80,11 +80,11 @@ namespace PersonalFinanceManagement.Tests
             var result = await _controller.Register(validRequest);
 
             var okResult = result as OkObjectResult;
-            Assert.IsNotNull(okResult, "Result OkObjectResult olmalı");
+            Assert.IsNotNull(okResult, "Result should be OkObjectResult");
 
-            // DTO'ya cast et
+            // Cast to DTO
             var response = okResult.Value as ResponseDto;
-            Assert.IsNotNull(response, "ResponseDto dönmeli");
+            Assert.IsNotNull(response, "ResponseDto should be returned");
             Assert.AreEqual("User registered successfully.", response.Message);
         }
     }
