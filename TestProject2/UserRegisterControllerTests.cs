@@ -18,12 +18,14 @@ namespace PersonalFinanceManagement.Tests
         public void Setup()
         {
             var options = new DbContextOptionsBuilder<FinanceContext>()
-                .UseInMemoryDatabase(databaseName: "TestDb_UserRegister")
+                .UseInMemoryDatabase(databaseName: "TestDb_UserRegister_" + Guid.NewGuid())
                 .Options;
 
             _context = new FinanceContext(options);
+            _context.Database.EnsureDeleted();
             _controller = new UserRegisterController(_context);
         }
+
 
         [TestCleanup]
         public void Cleanup()
@@ -45,6 +47,10 @@ namespace PersonalFinanceManagement.Tests
             await _context.Users.AddAsync(existingUser);
             await _context.SaveChangesAsync();
 
+            // Veritabanına eklenen kullanıcıyı kontrol et
+            var addedUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == existingUser.Email);
+            Assert.IsNotNull(addedUser, "User with the specified email should exist in the database.");
+
             // Request with existing email
             var duplicateRequest = new UserRegisterDto
             {
@@ -53,9 +59,10 @@ namespace PersonalFinanceManagement.Tests
                 Password = "newpassword"
             };
 
-            // Act
+            // Act - duplicate request with existing email
             var result = await _controller.Register(duplicateRequest);
 
+            // BadRequest olup olmadığını kontrol et
             var badRequestResult = result as BadRequestObjectResult;
             Assert.IsNotNull(badRequestResult, "Result should be BadRequestObjectResult");
 
@@ -64,6 +71,7 @@ namespace PersonalFinanceManagement.Tests
             Assert.IsNotNull(response, "ResponseDto should be returned");
             Assert.AreEqual("Email is already in use.", response.Message);
         }
+
 
         [TestMethod]
         public async Task Register_ValidRequest_ReturnsOkWithSuccessMessage()
@@ -86,6 +94,60 @@ namespace PersonalFinanceManagement.Tests
             var response = okResult.Value as ResponseDto;
             Assert.IsNotNull(response, "ResponseDto should be returned");
             Assert.AreEqual("User registered successfully.", response.Message);
+        }
+
+        [TestMethod]
+        public async Task GetUserByEmail_ReturnsCorrectUser()
+        {
+            // Arrange - create and save a user
+            var user = new User { Name = "Test User", Email = "testuser@test.com", PasswordHash = "pass123" };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            // Act - retrieve the user
+            var retrievedUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "testuser@test.com");
+
+            // Assert
+            Assert.IsNotNull(retrievedUser, "User should be found");
+            Assert.AreEqual(user.Name, retrievedUser.Name);
+        }
+
+        [TestMethod]
+        public async Task UpdateUser_ChangesUserName()
+        {
+            // Arrange - create a user
+            var user = new User { Name = "Old Name", Email = "update@test.com", PasswordHash = "pass123" };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            // Act - update user name
+            user.Name = "New Name";
+            await _context.SaveChangesAsync();  // Update çağrısına gerek yok, çünkü user zaten takip ediliyor
+
+            // Assert
+            var updatedUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "update@test.com");
+
+            Assert.IsNotNull(updatedUser, "User should exist");
+            Assert.AreEqual("New Name", updatedUser.Name, "User name should be updated");
+        }
+
+
+        [TestMethod]
+        public async Task DeleteUser_RemovesUserFromDatabase()
+        {
+            // Arrange - create a user
+            var user = new User { Name = "To Delete", Email = "delete@test.com", PasswordHash = "pass123" };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            // Act - delete user
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            var deletedUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "delete@test.com");
+
+            // Assert
+            Assert.IsNull(deletedUser, "User should be deleted");
         }
     }
 }

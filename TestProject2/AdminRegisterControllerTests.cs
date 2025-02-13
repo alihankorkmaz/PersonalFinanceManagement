@@ -132,5 +132,7 @@ namespace PersonalFinanceManagement.Tests
             Assert.IsNotNull(response, "ResponseDto is null! Is ResponseDto used in the controller?");
             Assert.AreEqual("Email is already in use.", response.Message);
         }
+
+
     }
 }
