@@ -20,20 +20,17 @@ namespace PersonalFinanceManagement.Tests
         [TestInitialize]
         public void Setup()
         {
-            // SQLite in-memory database bağlantısı
+            // SQLite in-memory database connection
             _connection = new SqliteConnection("DataSource=:memory:");
             _connection.Open();
 
-            // DbContextOptions oluştur
             _options = new DbContextOptionsBuilder<FinanceContext>()
                 .UseSqlite(_connection)
                 .Options;
 
-            // DbContext'i oluştur ve database'i migrate et
             _context = new FinanceContext(_options);
-            _context.Database.EnsureCreated(); // Database'i oluştur
+            _context.Database.EnsureCreated(); 
 
-            // Controller'ı oluştur
             _controller = new AdminRegisterController(_context);
         }
 
@@ -51,23 +48,23 @@ namespace PersonalFinanceManagement.Tests
             var validRequest = new AdminRegisterDto
             {
                 Name = "New Admin",
-                Email = "newadmin@test.com", // Benzersiz email
+                Email = "newadmin@test.com", //unique email
                 Password = "securepassword"
             };
 
             // Act
             var result = await _controller.Register(validRequest);
 
-            // Assert - Tip kontrolü
+
             var okResult = result as OkObjectResult;
             Assert.IsNotNull(okResult, "OkObjectResult dönmedi! Result: " + result?.GetType().Name);
 
-            // ResponseDto kontrolü
+            // response message check
             var response = okResult.Value as ResponseDto;
             Assert.IsNotNull(response, "ResponseDto null! Controller'da ResponseDto kullanılıyor mu?");
             Assert.AreEqual("Admin registered successfully.", response.Message);
 
-            // Veritabanında kaydı kontrol et
+            // check if the admin is added to the database
             var adminInDb = await _context.Admins.FirstOrDefaultAsync(a => a.Email == validRequest.Email);
             Assert.IsNotNull(adminInDb, "Admin veritabanına eklenmedi!");
             Assert.AreEqual(validRequest.Name, adminInDb.Name);
@@ -76,7 +73,7 @@ namespace PersonalFinanceManagement.Tests
         [TestMethod]
         public async Task Register_ExistingEmailInAdmins_ReturnsBadRequest()
         {
-            // Arrange - Var olan admin ekle
+            // Arrange - add existing admin
             var existingAdmin = new Admin
             {
                 Email = "admin@test.com",
@@ -89,7 +86,7 @@ namespace PersonalFinanceManagement.Tests
             var duplicateRequest = new AdminRegisterDto
             {
                 Name = "New Admin",
-                Email = "admin@test.com", // Aynı email
+                Email = "admin@test.com", // same email
                 Password = "newadmin123"
             };
 
@@ -108,7 +105,7 @@ namespace PersonalFinanceManagement.Tests
         [TestMethod]
         public async Task Register_ExistingEmailInUsers_ReturnsBadRequest()
         {
-            // Arrange - Var olan user ekle
+            // Arrange - add existing user
             var existingUser = new User
             {
                 Email = "user@test.com",
@@ -121,7 +118,7 @@ namespace PersonalFinanceManagement.Tests
             var duplicateRequest = new AdminRegisterDto
             {
                 Name = "New Admin",
-                Email = "user@test.com", // User'ın email'i
+                Email = "user@test.com", // user email
                 Password = "admin123"
             };
 

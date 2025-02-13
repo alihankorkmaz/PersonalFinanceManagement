@@ -35,7 +35,7 @@ namespace PersonalFinanceManagement.Tests
         [TestMethod]
         public async Task Register_ExistingEmail_ReturnsBadRequestWithMessage()
         {
-            // Arrange - Var olan kullanıcıyı ekle
+            // Arrange - add existing user
             var existingUser = new User
             {
                 Email = "existing@test.com",
@@ -45,7 +45,7 @@ namespace PersonalFinanceManagement.Tests
             await _context.Users.AddAsync(existingUser);
             await _context.SaveChangesAsync();
 
-            // Aynı email ile kayıt isteği
+            // request with existing email
             var duplicateRequest = new UserRegisterDto
             {
                 Name = "New User",
@@ -56,11 +56,10 @@ namespace PersonalFinanceManagement.Tests
             // Act
             var result = await _controller.Register(duplicateRequest);
 
-            // Assert - Tip kontrolü
             var badRequestResult = result as BadRequestObjectResult;
             Assert.IsNotNull(badRequestResult, "Result BadRequestObjectResult olmalı");
 
-            // DTO'ya cast et
+            // cast to DTO
             var response = badRequestResult.Value as ResponseDto;
             Assert.IsNotNull(response, "ResponseDto dönmeli");
             Assert.AreEqual("Email is already in use.", response.Message);
@@ -69,7 +68,7 @@ namespace PersonalFinanceManagement.Tests
         [TestMethod]
         public async Task Register_ValidRequest_ReturnsOkWithSuccessMessage()
         {
-            // Arrange - Yeni email
+            // Arrange - no existing user
             var validRequest = new UserRegisterDto
             {
                 Name = "New User",
@@ -80,7 +79,6 @@ namespace PersonalFinanceManagement.Tests
             // Act
             var result = await _controller.Register(validRequest);
 
-            // Assert - Tip kontrolü
             var okResult = result as OkObjectResult;
             Assert.IsNotNull(okResult, "Result OkObjectResult olmalı");
 
