@@ -96,6 +96,15 @@ Below are some sample JSON payloads for testing the API via Swagger or Postman.
   "category": "string",
   "description": "string"
 }
+```
+## Running Tests
+
+This project includes unit tests to verify the API's functionality. The tests are written using MSTest and cover various scenarios, including:
+
+- ✅ User registration with valid/invalid data
+- ✅ Retrieving user information
+- ✅ Updating user details
+- ✅ Deleting users and verifying deletion
 
 
 
